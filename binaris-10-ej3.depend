@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1608841805 source:c:\users\a_rsc\google drive\educem\dam-2\m6-uf1\fitxers\teoria\binaris-10-ej3\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<locale.h>
+	<windows.h>
+

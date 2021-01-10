@@ -76,21 +76,11 @@ int main()
     char option,
         cad[MAX_STRING], pisadatFile[MAX_STRING], dir[MAX_STRING], filename[MAX_STRING];
 
-    strcpy(cad, "C:\\foo\\foo\\baz.txt");
-    // strcpy(cad, "");
-
-    pathFilename(cad, dir, filename);
-
-    printf("%s\n", dir);
-    printf("%s\n", filename);
-
-    return 0;
-
 // --------------------------------------------------------------------------------------- FI DECLARACIO VARIABLES
 
     setlocale(LC_ALL, "spanish"); // Cambiar locale - Suficiente para máquinas Linux
 
-    strcpy(pisadatFile, "pisadat.dat");
+    strcpy(pisadatFile, "pisa.dat");
 
     remove(pisadatFile);
 
@@ -106,6 +96,8 @@ int main()
                 entrarCadena(cad, MAX_STRING);
 
                 pathFilename(cad, dir, filename);
+                // printf("%s\n", dir);
+                // printf("%s\n", filename);
 
                 if(strcmp(".", filename) == 0) { strcpy(filename, "PisaUE.txt");}
 

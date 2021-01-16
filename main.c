@@ -51,14 +51,14 @@ char getChar();
 int get_integer_interval(int min, int max);
 void entrarCadena(char str[], int size);
 bool searchOption(char *option, tMenu menu[MAX_MENU]);
-char* getOption(char option, tMenu menu[MAX_MENU]);
+char *getOption(char option, tMenu menu[MAX_MENU]);
 bool deleteCRLF(char cad[MAX_STRING]);
 void pathFilename(char cad[MAX_STRING], char dir[MAX_STRING], char filename[MAX_STRING]);
 FILE *obrir(char filename[MAX_STRING], char mode[4], bool printWarning);
-bool import(char filename[MAX_STRING], char filenamecopy[MAX_STRING]);
+bool copy(char origenTxtFilename[MAX_STRING], char destiTxtFilename[MAX_STRING]);
 tPisa llegirRegistre(char cad[MAX_STRING]);
 int showData(char filename[MAX_STRING]);
-bool copyFile(char filename[MAX_STRING], char copy[MAX_STRING]);
+bool copyFile(char origenDatFilename[MAX_STRING], char destiDatFilename[MAX_STRING]);
 int showDataByCountry(char filename[MAX_STRING]);
 int showDataByKnowledge(char filename[MAX_STRING]);
 int showDataByYear(char filename[MAX_STRING]);
@@ -74,15 +74,15 @@ int main()
 // --------------------------------------------------------------------------------------- DECLARACIO VARIABLES
 
     char option,
-        cad[MAX_STRING], pisadatFile[MAX_STRING], dir[MAX_STRING], filename[MAX_STRING];
+        cad[MAX_STRING], datFile[MAX_STRING], dir[MAX_STRING], txtFile[MAX_STRING];
 
 // --------------------------------------------------------------------------------------- FI DECLARACIO VARIABLES
 
     setlocale(LC_ALL, "spanish"); // Cambiar locale - Suficiente para máquinas Linux
 
-    strcpy(pisadatFile, "pisa.dat");
+    strcpy(datFile, "pisa.dat");
 
-    remove(pisadatFile);
+    remove(datFile);
 
     option = showMenu();
 
@@ -95,40 +95,40 @@ int main()
                 printf(" Introdueix un nom d'arxiu, el qual s'importaran les dades PISA [Per defecte: PisaUE.txt]: ");
                 entrarCadena(cad, MAX_STRING);
 
-                pathFilename(cad, dir, filename);
+                pathFilename(cad, dir, txtFile);
                 // printf("%s\n", dir);
-                // printf("%s\n", filename);
+                // printf("%s\n", txtFile);
 
-                if(strcmp(".", filename) == 0) { strcpy(filename, "PisaUE.txt");}
+                if(strcmp(".", txtFile) == 0) { strcpy(txtFile, "PisaUE.txt");}
 
-                if(import(filename, pisadatFile)) {
+                if(copy(txtFile, datFile)) {
                     printf("\n La importacio s'ha realitzat amb èxit.\n");
                 }else {
                     printf("\n No s'ha realitzat la importació.\n");
                 }
                 break;
             case 'B':
-                if(showData(pisadatFile) == 0) {
+                if(showData(datFile) == 0) {
                     printf(" No hi ha cap llista a l'arxiu.\n");
                 }
                 break;
             case 'C':
-                if(showDataByCountry(pisadatFile) == 0) {
+                if(showDataByCountry(datFile) == 0) {
                     printf(" No hi ha cap llista a l'arxiu.\n");
                 }
                 break;
             case 'D':
-                if(showDataByKnowledge(pisadatFile) == 0) {
+                if(showDataByKnowledge(datFile) == 0) {
                     printf(" No hi ha cap llista a l'arxiu.\n");
                 }
                 break;
             case 'E':
-                if(showDataByYear(pisadatFile) == 0) {
+                if(showDataByYear(datFile) == 0) {
                     printf(" No hi ha cap llista a l'arxiu.\n");
                 }
                 break;
             case 'F':
-                if(showDataByIndex(pisadatFile) == 0) {
+                if(showDataByIndex(datFile) == 0) {
                     printf(" No hi ha cap llista a l'arxiu.\n");
                 }
                 break;
@@ -236,7 +236,7 @@ bool searchOption(char *option, tMenu menu[MAX_MENU])
     return found;
 }
 
-char* getOption(char option, tMenu menu[MAX_MENU])
+char *getOption(char option, tMenu menu[MAX_MENU])
 {
     bool found = false;
     char *desc[MAX_STRING];
@@ -307,14 +307,14 @@ FILE *obrir(char filename[MAX_STRING], char mode[4], bool printWarning)
     return f;
 }
 
-bool import(char filename[MAX_STRING], char filenamecopy[MAX_STRING])
+bool copy(char origenTxtFilename[MAX_STRING], char destiDatFilename[MAX_STRING])
 {
     FILE *f, *copy;
     tPisa pisa;
     bool copied = false;
     char cad[MAX_STRING];
 
-    if((f=obrir(filename, "r", false)) && (copy=obrir(filenamecopy, "wb", false)))
+    if((f=obrir(origenTxtFilename, "r", false)) && (copy=obrir(destiDatFilename, "wb", false)))
     {
         while (feof(f)==0)
         {
@@ -391,13 +391,13 @@ int showData(char filename[MAX_STRING])
     return i;
 }
 
-bool copyFile(char filename[MAX_STRING], char filenamecopy[MAX_STRING])
+bool copyFile(char origenDatFile[MAX_STRING], char destiDatFilename[MAX_STRING])
 {
     FILE *f, *copy;
     tPisa pisa;
     bool copied = false;
 
-    if((f=obrir(filename, "rb", false)) && (copy=obrir(filenamecopy, "wb", false)))
+    if((f=obrir(origenDatFile, "rb", false)) && (copy=obrir(destiDatFilename, "wb", false)))
     {
         fread(&pisa, sizeof(tPisa), 1, f);
         while (feof(f)==0)
@@ -419,13 +419,13 @@ int showDataByCountry(char filename[MAX_STRING])
 {
     FILE *f;
     tPisa pisa, auxPisa;
-    char auxFileName[MAX_STRING];
+    char auxFilename[MAX_STRING];
     int i = 0, j = 0, qttPisas = 0;
 
-    strcpy(auxFileName, "auxiliar.dat");
-    copyFile(filename, auxFileName);
+    strcpy(auxFilename, "auxiliar.dat");
+    copyFile(filename, auxFilename);
 
-    if(f=obrir(auxFileName, "rb+", false))
+    if(f=obrir(auxFilename, "rb+", false))
     {
         qttPisas = calcularqttPisas(filename);
 
@@ -452,8 +452,8 @@ int showDataByCountry(char filename[MAX_STRING])
         fflush(f);
         fclose(f);
 
-        showData(auxFileName);
-        remove(auxFileName);
+        showData(auxFilename);
+        remove(auxFilename);
     }
 
     return qttPisas;
@@ -463,13 +463,13 @@ int showDataByKnowledge(char filename[MAX_STRING])
 {
     FILE *f;
     tPisa pisa, auxPisa;
-    char auxFileName[MAX_STRING];
+    char auxFilename[MAX_STRING];
     int i = 0, j = 0, qttPisas = 0;
 
-    strcpy(auxFileName, "auxiliar.dat");
-    copyFile(filename, auxFileName);
+    strcpy(auxFilename, "auxiliar.dat");
+    copyFile(filename, auxFilename);
 
-    if(f=obrir(auxFileName, "rb+", false))
+    if(f=obrir(auxFilename, "rb+", false))
     {
         qttPisas = calcularqttPisas(filename);
 
@@ -496,8 +496,8 @@ int showDataByKnowledge(char filename[MAX_STRING])
         fflush(f);
         fclose(f);
 
-        showData(auxFileName);
-        remove(auxFileName);
+        showData(auxFilename);
+        remove(auxFilename);
     }
 
     return qttPisas;
@@ -507,13 +507,13 @@ int showDataByYear(char filename[MAX_STRING])
 {
     FILE *f;
     tPisa pisa, auxPisa;
-    char auxFileName[MAX_STRING];
+    char auxFilename[MAX_STRING];
     int i = 0, j = 0, qttPisas = 0;
 
-    strcpy(auxFileName, "auxiliar.dat");
-    copyFile(filename, auxFileName);
+    strcpy(auxFilename, "auxiliar.dat");
+    copyFile(filename, auxFilename);
 
-    if(f=obrir(auxFileName, "rb+", false))
+    if(f=obrir(auxFilename, "rb+", false))
     {
         qttPisas = calcularqttPisas(filename);
 
@@ -540,8 +540,8 @@ int showDataByYear(char filename[MAX_STRING])
         fflush(f);
         fclose(f);
 
-        showData(auxFileName);
-        remove(auxFileName);
+        showData(auxFilename);
+        remove(auxFilename);
     }
 
     return qttPisas;
@@ -551,13 +551,13 @@ int showDataByIndex(char filename[MAX_STRING])
 {
     FILE *f;
     tPisa pisa, auxPisa;
-    char auxFileName[MAX_STRING];
+    char auxFilename[MAX_STRING];
     int i = 0, j = 0, qttPisas = 0;
 
-    strcpy(auxFileName, "auxiliar.dat");
-    copyFile(filename, auxFileName);
+    strcpy(auxFilename, "auxiliar.dat");
+    copyFile(filename, auxFilename);
 
-    if(f=obrir(auxFileName, "rb+", false))
+    if(f=obrir(auxFilename, "rb+", false))
     {
         qttPisas = calcularqttPisas(filename);
 
@@ -584,8 +584,8 @@ int showDataByIndex(char filename[MAX_STRING])
         fflush(f);
         fclose(f);
 
-        showData(auxFileName);
-        remove(auxFileName);
+        showData(auxFilename);
+        remove(auxFilename);
     }
 
     return qttPisas;
